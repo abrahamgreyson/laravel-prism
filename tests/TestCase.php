@@ -2,9 +2,9 @@
 
 namespace Abe\Prism\Tests;
 
+use Abe\Prism\PrismServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Abe\Prism\PrismServiceProvider;
 
 class TestCase extends Orchestra
 {

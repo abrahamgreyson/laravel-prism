@@ -2,9 +2,9 @@
 
 namespace Abe\Prism;
 
+use Abe\Prism\Commands\PrismCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Abe\Prism\Commands\PrismCommand;
 
 class PrismServiceProvider extends PackageServiceProvider
 {
