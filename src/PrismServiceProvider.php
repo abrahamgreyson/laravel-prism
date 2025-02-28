@@ -28,7 +28,7 @@ class PrismServiceProvider extends PackageServiceProvider
         }
         // snowflake setting
         $this->app->singleton('snowflake', function ($app) {
-            return (new \Godruoyi\Snowflake\Snowflake())
+            return (new \Godruoyi\Snowflake\Snowflake)
                 // the day I started rewrite this project
                 ->setStartTimeStamp(strtotime('2024-05-20') * 1000)
                 ->setSequenceResolver(new \Godruoyi\Snowflake\LaravelSequenceResolver($app->get('cache.store')));
