@@ -26,6 +26,10 @@ class PrismServiceProvider extends PackageServiceProvider
         if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
         }
+        // Telescope filter
+        if ($this->app->environment('local') && class_exists(\App\Providers\TelescopeServiceProvider::class)) {
+            $this->app->register(\App\Providers\TelescopeServiceProvider::class);
+        }
         // snowflake setting
         $this->app->singleton('snowflake', function ($app) {
             return (new \Godruoyi\Snowflake\Snowflake)
