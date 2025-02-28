@@ -22,8 +22,7 @@
         "godruoyi/php-snowflake": "^3.1",
         "illuminate/contracts": "^10.0||^11.0||^12.0",
         "jiannei/laravel-response": "^6.0",
-        "spatie/laravel-package-tools": "^1.19",
-        "laravel/telescope": "^5.5"
+        "spatie/laravel-package-tools": "^1.19"
     },
     "require-dev": {
         "larastan/larastan": "^2.9.14",
@@ -55,10 +54,7 @@
         "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint",
-        "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
-        ]
+        "format": "vendor/bin/pint"
     },
     "config": {
         "sort-packages": true,
