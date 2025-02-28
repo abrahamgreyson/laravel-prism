@@ -15,7 +15,7 @@ trait HasSnowflake
     {
         static::creating(function ($model) {
             $columns = $model->getSnowflakeColumns();
-            
+
             // 遍历所有配置的雪花ID字段
             foreach ($columns as $column) {
                 // 如果字段值为空，则生成雪花ID
@@ -25,7 +25,7 @@ trait HasSnowflake
             }
         });
     }
-    
+
     /**
      * 获取所有雪花ID字段
      *
@@ -37,7 +37,7 @@ trait HasSnowflake
         if (property_exists($this, 'snowflakeColumns') && is_array($this->snowflakeColumns)) {
             return $this->snowflakeColumns;
         }
-        
+
         // 否则默认使用主键
         return [$this->getKeyName()];
     }
@@ -49,15 +49,15 @@ trait HasSnowflake
     {
         // 确保雪花ID字段在JSON序列化时转为字符串
         $columns = $this->getSnowflakeColumns();
-        
+
         // 如果没有自定义$casts数组，初始化一个
-        if (!isset($this->casts)) {
+        if (! isset($this->casts)) {
             $this->casts = [];
         }
-        
+
         // 将所有雪花ID字段添加到$casts中，确保它们被序列化为字符串
         foreach ($columns as $column) {
-            if (!isset($this->casts[$column])) {
+            if (! isset($this->casts[$column])) {
                 $this->casts[$column] = 'string';
             }
         }
