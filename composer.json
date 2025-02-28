@@ -70,10 +70,7 @@
             ],
             "aliases": {
                 "Prism": "Abe\\Prism\\Facades\\Prism"
-            },
-            "dont-discover": [
-                "laravel/telescope"
-            ]
+            }
         }
     },
     "minimum-stability": "dev",
