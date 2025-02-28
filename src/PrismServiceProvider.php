@@ -3,7 +3,6 @@
 namespace Abe\Prism;
 
 use Carbon\CarbonImmutable;
-use Closure;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Spatie\LaravelPackageTools\Package;
