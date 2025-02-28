@@ -23,14 +23,14 @@ class PrismServiceProvider extends PackageServiceProvider
     public function register(): void
     {
         // Telescope can be run only in local
-        if ($this->app->environment('local')) {
+        if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
         }
         // snowflake setting
         $this->app->singleton('snowflake', function ($app) {
             return (new \Godruoyi\Snowflake\Snowflake)
                 // the day I started rewrite this project
-                ->setStartTimeStamp(strtotime('2024-05-20') * 1000)
+                ->setStartTimeStamp(strtotime('2025-02-14') * 1000)
                 ->setSequenceResolver(new \Godruoyi\Snowflake\LaravelSequenceResolver($app->get('cache.store')));
         });
     }

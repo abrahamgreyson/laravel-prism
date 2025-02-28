@@ -22,12 +22,12 @@
         "godruoyi/php-snowflake": "^3.1",
         "illuminate/contracts": "^10.0||^11.0||^12.0",
         "jiannei/laravel-response": "^6.0",
-        "spatie/laravel-package-tools": "^1.19"
+        "spatie/laravel-package-tools": "^1.19",
+        "laravel/telescope": "^5.5"
     },
     "require-dev": {
         "larastan/larastan": "^2.9.14",
         "laravel/pint": "^1.21",
-        "laravel/telescope": "^5.5",
         "nunomaduro/collision": "^8.6.1||^7.10.0",
         "orchestra/testbench": "^9.11.0||^8.22.0",
         "pestphp/pest": "^3.7.4",
@@ -55,7 +55,10 @@
         "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
+        "format": "vendor/bin/pint",
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ]
     },
     "config": {
         "sort-packages": true,
@@ -71,7 +74,10 @@
             ],
             "aliases": {
                 "Prism": "Abe\\Prism\\Facades\\Prism"
-            }
+            },
+            "dont-discover": [
+                "laravel/telescope"
+            ]
         }
     },
     "minimum-stability": "dev",
