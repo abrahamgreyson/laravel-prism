@@ -94,19 +94,3 @@ test('getSnowflakeColumns 方法返回正确的字段', function () {
     expect($customModel->getSnowflakeColumns())
         ->toBe(['snowflake_id', 'another_snowflake_id']);
 });
-
-test('convertSnowflakeFromRequest 方法正确转换字符串 ID', function () {
-    $model = new TestModel();
-    $data = [
-        'id' => '123456789012345678',
-        'name' => 'Test'
-    ];
-    
-    $converted = $model->convertSnowflakeFromRequest($data);
-    
-    expect($converted)
-        ->toHaveKey('id')
-        ->and($converted['id'])
-        ->toBeInt()
-        ->toBe(123456789012345678);
-});

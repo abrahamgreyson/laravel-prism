@@ -65,25 +65,4 @@ trait HasSnowflake
         // 否则默认使用主键
         return [$this->getKeyName()];
     }
-
-    /**
-     * 从请求数据中转换雪花ID
-     * 可在控制器中调用此方法处理前端提交的数据
-     *
-     * @param array $data
-     * @return array
-     */
-    public function convertSnowflakeFromRequest(array $data)
-    {
-        $columns = $this->getSnowflakeColumns();
-        
-        foreach ($columns as $column) {
-            if (isset($data[$column]) && is_string($data[$column])) {
-                // 将字符串转为整数
-                $data[$column] = (int) $data[$column];
-            }
-        }
-        
-        return $data;
-    }
 }
