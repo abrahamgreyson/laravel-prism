@@ -24,7 +24,7 @@ unit-test-job:   # 运行 PHPUnit 测试
   image: php:8.3
   stage: test
   script:
-    - XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text --colors=never
+    - XDEBUG_MODE=coverage ./vendor/bin/pest --coverage-text --colors=never
   retry:
     max: 1
     when: always
