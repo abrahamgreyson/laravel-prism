@@ -1,0 +1,41 @@
+stages:          # 定义执行的阶段顺序
+  - test
+
+variables:
+  COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.composer"
+
+cache:
+  paths:
+    - vendor/
+    - $COMPOSER_CACHE_DIR
+
+build-job:       # 安装依赖
+  image: php-8.3:latest
+  stage: test
+  before_script:
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  script:
+    - composer install --prefer-dist --no-progress
+  retry:
+    max: 2
+    when: script_failure
+
+unit-test-job:   # 运行 PHPUnit 测试
+  image: php-8.3:latest
+  stage: test
+  script:
+    - XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text --colors=never
+  retry:
+    max: 1
+    when: always
+  artifacts:
+    when: always
+    paths:
+      - junit.xml
+      - cobertura.xml
+    reports:
+      junit: junit.xml
+      coverage_report:
+        coverage_format: 'cobertura'
+        path: cobertura.xml
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
