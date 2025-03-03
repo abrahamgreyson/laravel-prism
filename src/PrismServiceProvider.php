@@ -2,13 +2,13 @@
 
 namespace Abe\Prism;
 
+use Abe\Prism\Commands\InstallCommand;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Abe\Prism\Commands\InstallCommand;
 
 class PrismServiceProvider extends PackageServiceProvider
 {

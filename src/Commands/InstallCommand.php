@@ -4,11 +4,10 @@ namespace Abe\Prism\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use function Laravel\Prompts\confirm;
+
 use function Laravel\Prompts\info;
-use function Laravel\Prompts\note;
 use function Laravel\Prompts\multiselect;
-use function Laravel\Prompts\text;
+use function Laravel\Prompts\note;
 
 class InstallCommand extends Command
 {
@@ -33,7 +32,7 @@ class InstallCommand extends Command
 
         info('Prism 安装完成！');
 
-        if (!$this->option('no-interaction')) {
+        if (! $this->option('no-interaction')) {
             note('您可以在 config/prism.php 文件中修改配置选项。');
         }
 
@@ -42,7 +41,7 @@ class InstallCommand extends Command
 
     /**
      * 配置选项
-     * 
+     *
      * @return array
      */
     protected function configureOptions()
@@ -76,8 +75,7 @@ class InstallCommand extends Command
 
     /**
      * 发布 Prism 配置文件
-     * 
-     * @param array $options
+     *
      * @return void
      */
     protected function publishPrismConfig(array $options)
@@ -109,7 +107,7 @@ class InstallCommand extends Command
 
     /**
      * 发布依赖包的资源
-     * 
+     *
      * @return void
      */
     protected function publishDependencies()

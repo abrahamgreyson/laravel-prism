@@ -22,7 +22,6 @@ trait HasResponse
         return Response::fail($message, $code, $data);
     }
 
-
     public function fail(string $message = '', int $code = 500, array $data = []): JsonResponse
     {
         return Response::fail($message, $code, $data);
