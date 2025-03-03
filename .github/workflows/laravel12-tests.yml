@@ -1,33 +1,24 @@
-name: Laravel 10-11 Tests
+name: Laravel 12 Tests
 
 on:
   push:
     paths:
       - '**.php'
-      - '.github/workflows/run-tests.yml'
+      - '.github/workflows/laravel12-tests.yml'
       - 'phpunit.xml.dist'
       - 'composer.json'
       - 'composer.lock'
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
         php: [8.3, 8.4]
-        laravel: [10, 11]
-        include:
-          - laravel: 11
-            testbench: 9.*
-            pest-plugin-laravel: ^2.0
-          - laravel: 10
-            testbench: 8.*
-            pest-plugin-laravel: ^2.0
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }}
+    name: P${{ matrix.php }} - Laravel 12
 
     steps:
       - name: Checkout code
@@ -47,8 +38,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:^${{ matrix.laravel }}.0" "orchestra/testbench:${{ matrix.testbench }}" "pestphp/pest-plugin-laravel:${{ matrix.pest-plugin-laravel }}" --no-interaction --no-update --dev
-          composer update --prefer-stable --prefer-dist --no-interaction
+          composer config allow-plugins.pestphp/pest-plugin true
+          composer config allow-plugins.phpstan/extension-installer true
+          # 移除composer.json中的依赖限制，创建临时配置
+          cp composer.json composer.json.backup
+          jq '.["require-dev"] = {"orchestra/testbench": "^10.0", "pestphp/pest": "^3.0", "pestphp/pest-plugin-laravel": "^3.1"}' composer.json > temp.json && mv temp.json composer.json
+          # 安装Laravel 12及兼容依赖
+          composer require --no-update --dev "laravel/framework:^12.0"
+          composer update --prefer-stable --prefer-dist --no-interaction --ignore-platform-reqs
+          # 恢复原始composer.json
+          mv composer.json.backup composer.json
 
       - name: List Installed Dependencies
         run: composer show -D
