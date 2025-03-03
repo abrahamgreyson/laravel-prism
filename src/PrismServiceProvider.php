@@ -3,6 +3,7 @@
 namespace Abe\Prism;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Spatie\LaravelPackageTools\Package;
@@ -46,5 +47,24 @@ class PrismServiceProvider extends PackageServiceProvider
 
         // use immutable dates
         Date::use(CarbonImmutable::class);
+
+        // 注册计划任务
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            $this->registerTelescopePruneCommand($schedule);
+        });
+    }
+
+    /**
+     * 注册 Telescope 清理命令到计划任务
+     *
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     * @return void
+     */
+    protected function registerTelescopePruneCommand(Schedule $schedule): void
+    {
+        // 检查是否安装并注册了 Telescope
+        if (class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+            $schedule->command('telescope:prune --hours=24')->daily()->at('02:00');
+        }
     }
 }
