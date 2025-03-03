@@ -10,7 +10,7 @@ cache:
     - $COMPOSER_CACHE_DIR
 
 build-job:       # 安装依赖
-  image: php-8.3:latest
+  image: php:8.3
   stage: test
   before_script:
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -21,7 +21,7 @@ build-job:       # 安装依赖
     when: script_failure
 
 unit-test-job:   # 运行 PHPUnit 测试
-  image: php-8.3:latest
+  image: php:8.3
   stage: test
   script:
     - XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text --colors=never
