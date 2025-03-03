@@ -13,7 +13,7 @@ trait HasSnowflake
     {
         // 在初始化时设置模型为非自增，而不是通过属性定义
         $this->incrementing = false;
-        
+
         // 确保雪花ID字段在JSON序列化时转为字符串
         $columns = $this->getSnowflakeColumns();
 
@@ -49,7 +49,7 @@ trait HasSnowflake
             }
         });
     }
-    
+
     /**
      * 获取所有雪花ID字段
      *
@@ -61,7 +61,7 @@ trait HasSnowflake
         if (property_exists($this, 'snowflakeColumns') && is_array($this->snowflakeColumns)) {
             return $this->snowflakeColumns;
         }
-        
+
         // 否则默认使用主键
         return [$this->getKeyName()];
     }
