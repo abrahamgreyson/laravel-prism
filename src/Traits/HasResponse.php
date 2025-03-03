@@ -16,4 +16,19 @@ trait HasResponse
     {
         return Response::fail($message, $code, $data);
     }
+
+    /**
+     * Returns a failure response.
+     * 
+     * @alias $self::error
+     *
+     * @param string $message
+     * @param int $code
+     * @param array $data
+     * @return JsonResponse
+     */
+    public function fail(string $message = '', int $code = 500, array $data = []): JsonResponse
+    {
+        return Response::fail($message, $code, $data);
+    }
 }
