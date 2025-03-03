@@ -8,7 +8,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\note;
@@ -34,10 +33,6 @@ class InstallCommand extends Command
 
     /**
      * 执行命令
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -60,10 +55,6 @@ class InstallCommand extends Command
 
     /**
      * 配置选项
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return array
      */
     protected function configureOptions(InputInterface $input, OutputInterface $output): array
     {
@@ -74,7 +65,7 @@ class InstallCommand extends Command
         ];
 
         // 如果是非交互模式，直接返回默认选项
-        if (!$input->isInteractive()) {
+        if (! $input->isInteractive()) {
             return $options;
         }
 
@@ -83,14 +74,14 @@ class InstallCommand extends Command
             'immutable_date' => '不可变日期 (Immutable Date) - 使模型日期字段和 Date Facade 返回 Carbon 不可变实例',
             'unified_response' => '统一格式的响应',
         ];
-        
+
         // 使用 Laravel Prompts 的 multiselect
         $selectedKeys = multiselect(
             '请选择要启用的功能：',
             $features,
             array_keys($options)
         );
-        
+
         // 更新选项
         foreach ($features as $key => $description) {
             $options[$key] = in_array($key, $selectedKeys);
@@ -101,11 +92,6 @@ class InstallCommand extends Command
 
     /**
      * 发布 Prism 配置文件
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @param array $options
-     * @return void
      */
     protected function publishPrismConfig(InputInterface $input, OutputInterface $output, array $options): void
     {
@@ -139,11 +125,6 @@ class InstallCommand extends Command
 
     /**
      * 发布依赖包的资源
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @param array $options
-     * @return void
      */
     protected function publishDependencies(InputInterface $input, OutputInterface $output, array $options): void
     {

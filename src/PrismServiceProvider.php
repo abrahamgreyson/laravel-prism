@@ -28,7 +28,7 @@ class PrismServiceProvider extends PackageServiceProvider
     public function register(): void
     {
         parent::register();
-        
+
         // Telescope can be run only in local
         if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
@@ -49,7 +49,7 @@ class PrismServiceProvider extends PackageServiceProvider
     public function boot(): void
     {
         parent::boot();
-        
+
         // disabled resource wrapping
         JsonResource::withoutWrapping();
 
