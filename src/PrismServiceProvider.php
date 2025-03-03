@@ -50,18 +50,6 @@ class PrismServiceProvider extends PackageServiceProvider
     {
         parent::boot();
         
-        // 使用 Laravel 原生方式注册命令
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                InstallCommand::class,
-            ]);
-            
-            // 确保正确发布配置文件
-            $this->publishes([
-                __DIR__.'/../config/prism.php' => config_path('prism.php'),
-            ], 'prism-config');
-        }
-        
         // disabled resource wrapping
         JsonResource::withoutWrapping();
 

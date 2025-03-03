@@ -111,7 +111,7 @@ class InstallCommand extends Command
     {
         $output->writeln('<info>发布 Prism 配置文件...</info>');
 
-        $this->callSilent('vendor:publish', [
+        $this->call('vendor:publish', [
             '--tag' => 'prism-config',
             '--force' => $input->getOption('force'),
         ]);
@@ -150,7 +150,7 @@ class InstallCommand extends Command
         // 发布 jiannei/laravel-response 配置
         if ($options['unified_response']) {
             $output->writeln('<info>发布统一格式的响应配置...</info>');
-            $this->callSilent('vendor:publish', [
+            $this->call('vendor:publish', [
                 '--provider' => 'Jiannei\Response\Laravel\Providers\LaravelServiceProvider',
                 '--force' => $input->getOption('force'),
             ]);
