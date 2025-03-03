@@ -18,7 +18,7 @@ class PrismServiceProvider extends PackageServiceProvider
          *
          * More info: https://github.com/spatie/laravel-package-tools
          */
-        $package->name('laravel-prism')->hasConfigFile();
+        $package->name('laravel-prism');
     }
 
     public function register(): void
