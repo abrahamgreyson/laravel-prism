@@ -19,6 +19,7 @@ class PrismServiceProvider extends PackageServiceProvider
          *
          * More info: https://github.com/spatie/laravel-package-tools
          */
+
         $package->name('laravel-prism')
             ->hasConfigFile('prism')
             ->hasCommand(InstallCommand::class);
@@ -57,6 +58,14 @@ class PrismServiceProvider extends PackageServiceProvider
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
             $this->registerTelescopePruneCommand($schedule);
         });
+        // 注册 install 命令
+        
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                InstallCommand::class,
+            ]);
+            
+        }
     }
 
     /**
