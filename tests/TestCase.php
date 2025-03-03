@@ -41,5 +41,27 @@ class TestCase extends Orchestra
             'database' => ':memory:',
             'prefix'   => '',
         ]);
+        
+        // 确保 Laravel\Telescope\TelescopeServiceProvider 类可用于测试
+        if (!class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+            eval('namespace Laravel\Telescope { class TelescopeServiceProvider extends \Illuminate\Support\ServiceProvider {} }');
+        }
+        
+        // 确保 App\Providers\TelescopeServiceProvider 类可用于测试
+        if (!class_exists(\App\Providers\TelescopeServiceProvider::class)) {
+            eval('namespace App\Providers { class TelescopeServiceProvider extends \Illuminate\Support\ServiceProvider {} }');
+        }
+    }
+    
+    /**
+     * 定义环境
+     *
+     * @param string $environment
+     * @return $this
+     */
+    protected function withEnvironment(string $environment)
+    {
+        $this->app['env'] = $environment;
+        return $this;
     }
 }
