@@ -56,9 +56,6 @@ class PrismServiceProvider extends PackageServiceProvider
 
     /**
      * 注册 Telescope 清理命令到计划任务
-     *
-     * @param \Illuminate\Console\Scheduling\Schedule $schedule
-     * @return void
      */
     protected function registerTelescopePruneCommand(Schedule $schedule): void
     {
