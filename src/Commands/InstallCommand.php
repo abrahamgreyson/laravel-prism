@@ -15,7 +15,7 @@ use function Laravel\Prompts\note;
 
 class InstallCommand extends Command
 {
-    protected $name = 'prism:install';
+    protected $signature = 'prism:install';
 
     protected $description = 'Install the Prism package';
 

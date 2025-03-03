@@ -27,6 +27,8 @@ class PrismServiceProvider extends PackageServiceProvider
 
     public function register(): void
     {
+        parent::register();
+        
         // Telescope can be run only in local
         if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
@@ -46,6 +48,20 @@ class PrismServiceProvider extends PackageServiceProvider
 
     public function boot(): void
     {
+        parent::boot();
+        
+        // 使用 Laravel 原生方式注册命令
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                InstallCommand::class,
+            ]);
+            
+            // 确保正确发布配置文件
+            $this->publishes([
+                __DIR__.'/../config/prism.php' => config_path('prism.php'),
+            ], 'prism-config');
+        }
+        
         // disabled resource wrapping
         JsonResource::withoutWrapping();
 
@@ -58,14 +74,6 @@ class PrismServiceProvider extends PackageServiceProvider
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
             $this->registerTelescopePruneCommand($schedule);
         });
-        // 注册 install 命令
-        
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                InstallCommand::class,
-            ]);
-            
-        }
     }
 
     /**
