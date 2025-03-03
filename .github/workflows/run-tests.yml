@@ -22,15 +22,15 @@ jobs:
         include:
           - laravel: 12
             testbench: 10.*
-            carbon: ^3.8.4
+            # carbon: ^3.8.4
             pest-plugin-laravel: ^3.1
           - laravel: 11
             testbench: 9.*
-            carbon: ^2.63
+            # carbon: ^2.63
             pest-plugin-laravel: ^2.0
           - laravel: 10
             testbench: 8.*
-            carbon: ^2.63
+            # carbon: ^2.63
             pest-plugin-laravel: ^2.0
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }}
@@ -53,7 +53,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:^${{ matrix.laravel }}.0" "orchestra/testbench:${{ matrix.testbench }}" "nesbot/carbon:${{ matrix.carbon }}" "pestphp/pest-plugin-laravel:${{ matrix.pest-plugin-laravel }}" --no-interaction --no-update --dev
+          composer require "laravel/framework:^${{ matrix.laravel }}.0" "orchestra/testbench:${{ matrix.testbench }}" "pestphp/pest-plugin-laravel:${{ matrix.pest-plugin-laravel }}" --no-interaction --no-update --dev
           composer update --prefer-stable --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
