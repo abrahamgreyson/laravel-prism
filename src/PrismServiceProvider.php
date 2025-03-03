@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Abe\Prism\Commands\InstallCommand;
 
 class PrismServiceProvider extends PackageServiceProvider
 {
@@ -18,7 +19,9 @@ class PrismServiceProvider extends PackageServiceProvider
          *
          * More info: https://github.com/spatie/laravel-package-tools
          */
-        $package->name('laravel-prism');
+        $package->name('laravel-prism')
+            ->hasConfigFile('prism')
+            ->hasCommand(InstallCommand::class);
     }
 
     public function register(): void
@@ -45,8 +48,10 @@ class PrismServiceProvider extends PackageServiceProvider
         // disabled resource wrapping
         JsonResource::withoutWrapping();
 
-        // use immutable dates
-        Date::use(CarbonImmutable::class);
+        // 根据配置决定是否使用不可变日期
+        if (config('prism.immutable_date', true)) {
+            Date::use(CarbonImmutable::class);
+        }
 
         // 注册计划任务
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {

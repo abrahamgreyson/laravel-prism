@@ -12,16 +12,17 @@ trait HasResponse
         return Response::success($data, $message, $code);
     }
 
-    public function error(string $message = '', $code = 500, array $data = []): JsonResponse
+    /**
+     * Returns a failure response.
+     *
+     * @alias $self::fail
+     */
+    public function error(string $message = '', int $code = 500, array $data = []): JsonResponse
     {
         return Response::fail($message, $code, $data);
     }
 
-    /**
-     * Returns a failure response.
-     *
-     * @alias $self::error
-     */
+
     public function fail(string $message = '', int $code = 500, array $data = []): JsonResponse
     {
         return Response::fail($message, $code, $data);
