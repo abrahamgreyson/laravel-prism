@@ -25,18 +25,17 @@ class PrismServiceProvider extends PackageServiceProvider
             ->hasCommand(InstallCommand::class);
     }
 
-    public function register(): void
+    public function registeringPackage(): void
     {
-        parent::register();
+        $this->registerSnowflake();
+        $this->registerTelescope();
+    }
 
-        // Telescope can be run only in local
-        if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
-            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
-        }
-        // Telescope filter
-        if ($this->app->environment('local') && class_exists(\App\Providers\TelescopeServiceProvider::class)) {
-            $this->app->register(\App\Providers\TelescopeServiceProvider::class);
-        }
+    /**
+     * Register snowflake instance.
+     */
+    public function registerSnowflake(): void
+    {
         // snowflake setting
         $this->app->singleton('snowflake', function ($app) {
             return (new \Godruoyi\Snowflake\Snowflake)
@@ -46,10 +45,25 @@ class PrismServiceProvider extends PackageServiceProvider
         });
     }
 
-    public function boot(): void
+    /**
+     * Register Telescope services in local environment.
+     *
+     * @return void
+     */
+    public function registerTelescope(): void
     {
-        parent::boot();
+        // Telescope can be run only in local
+        if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+        }
+        // Telescope filter
+        if ($this->app->environment('local') && class_exists(\App\Providers\TelescopeServiceProvider::class)) {
+            $this->app->register(\App\Providers\TelescopeServiceProvider::class);
+        }
+    }
 
+    public function bootingPackage(): void
+    {
         // disabled resource wrapping
         JsonResource::withoutWrapping();
 
