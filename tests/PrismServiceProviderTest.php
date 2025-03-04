@@ -5,6 +5,7 @@ namespace Abe\Prism\Tests;
 use Abe\Prism\PrismServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
+use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Laravel\Telescope\TelescopeServiceProvider;
 use Mockery;
 
@@ -33,7 +34,7 @@ test('snowflake 服务成功注册', function () {
 
 test('在 local 环境下使用 Mockery 测试 Telescope 注册', function () {
     // 创建一个模拟应用，设置为 local 环境
-    $app = Mockery::mock(Application::class);
+    $app = Mockery::mock(Application::class.','.CachesConfiguration::class);
     $app->shouldReceive('environment')->with('local')->andReturn(true);
     $app->shouldReceive('register')->with(TelescopeServiceProvider::class)->once();
     $app->shouldReceive('register')->with(\App\Providers\TelescopeServiceProvider::class)->once();
@@ -45,13 +46,22 @@ test('在 local 环境下使用 Mockery 测试 Telescope 注册', function () {
             return 0;
         }
     });
+    
+    // 添加对 configurationIsCached 方法的期望
+    $app->shouldReceive('configurationIsCached')->andReturn(false);
+    
+    // 添加配置相关方法的模拟
+    $config = Mockery::mock('config');
+    $config->shouldReceive('get')->andReturn([]);
+    $config->shouldReceive('set')->andReturn($config);
+    $app->shouldReceive('make')->with('config')->andReturn($config);
 
     $provider = new PrismServiceProvider($app);
     $provider->register();
 });
 
 test('在 production 环境下使用 Mockery 测试 Telescope 不被注册', function () {
-    $app = Mockery::mock(Application::class);
+    $app = Mockery::mock(Application::class.','.CachesConfiguration::class);
     $app->shouldReceive('environment')->with('local')->andReturn(false);
     $app->shouldNotReceive('register')->with(TelescopeServiceProvider::class);
     $app->shouldNotReceive('register')->with(\App\Providers\TelescopeServiceProvider::class);
@@ -63,6 +73,15 @@ test('在 production 环境下使用 Mockery 测试 Telescope 不被注册', fun
             return 0;
         }
     });
+    
+    // 添加对 configurationIsCached 方法的期望
+    $app->shouldReceive('configurationIsCached')->andReturn(false);
+    
+    // 添加配置相关方法的模拟
+    $config = Mockery::mock('config');
+    $config->shouldReceive('get')->andReturn([]);
+    $config->shouldReceive('set')->andReturn($config);
+    $app->shouldReceive('make')->with('config')->andReturn($config);
 
     $provider = new PrismServiceProvider($app);
     $provider->register();
