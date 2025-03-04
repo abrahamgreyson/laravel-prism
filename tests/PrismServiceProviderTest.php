@@ -4,8 +4,8 @@ namespace Abe\Prism\Tests;
 
 use Abe\Prism\PrismServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Application;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
+use Illuminate\Foundation\Application;
 use Laravel\Telescope\TelescopeServiceProvider;
 use Mockery;
 use Spatie\LaravelPackageTools\Package;
@@ -35,46 +35,50 @@ test('snowflake 服务成功注册', function () {
 
 test('在 local 环境下通过 registerTelescope 方法测试 Telescope 注册', function () {
     // 创建一个模拟应用，设置为 local 环境
-    $app = Mockery::mock(Application::class . ',' . CachesConfiguration::class);
+    $app = Mockery::mock(Application::class.','.CachesConfiguration::class);
     $app->shouldReceive('environment')->with('local')->andReturn(true);
     $app->shouldReceive('register')->with(TelescopeServiceProvider::class)->once();
     $app->shouldReceive('register')->with(\App\Providers\TelescopeServiceProvider::class)->once();
-    
+
     // 创建服务提供者
     $provider = new PrismServiceProvider($app);
-    
+
     // 直接调用 registerTelescope 方法
     $provider->registerTelescope();
 });
 
 test('在 production 环境下通过 registerTelescope 方法测试 Telescope 不被注册', function () {
-    $app = Mockery::mock(Application::class . ',' . CachesConfiguration::class);
+    $app = Mockery::mock(Application::class.','.CachesConfiguration::class);
     $app->shouldReceive('environment')->with('local')->andReturn(false);
     $app->shouldNotReceive('register')->with(TelescopeServiceProvider::class);
     $app->shouldNotReceive('register')->with(\App\Providers\TelescopeServiceProvider::class);
-    
+
     // 创建服务提供者
     $provider = new PrismServiceProvider($app);
-    
+
     // 直接调用 registerTelescope 方法
     $provider->registerTelescope();
 });
 
 test('通过 registerSnowflake 方法测试 Snowflake 注册', function () {
-    $app = Mockery::mock(Application::class . ',' . CachesConfiguration::class);
+    $app = Mockery::mock(Application::class.','.CachesConfiguration::class);
     $app->shouldReceive('singleton')
         ->withArgs(['snowflake', Mockery::type('Closure')])
         ->once();
-    
+
     $app->shouldReceive('get')
         ->with('cache.store')
-        ->andReturn(new class {
-            public function remember() { return 0; }
+        ->andReturn(new class
+        {
+            public function remember()
+            {
+                return 0;
+            }
         });
-    
+
     // 创建服务提供者
     $provider = new PrismServiceProvider($app);
-    
+
     // 直接调用 registerSnowflake 方法
     $provider->registerSnowflake();
 });
@@ -83,11 +87,11 @@ test('registeringPackage 方法正确调用所有注册方法', function () {
     // 创建一个部分 mock，只 mock registerSnowflake 和 registerTelescope 方法
     $provider = Mockery::mock(PrismServiceProvider::class.'[registerSnowflake,registerTelescope]', [$this->app]);
     $provider->shouldAllowMockingProtectedMethods();
-    
+
     // 设置期望
     $provider->shouldReceive('registerSnowflake')->once();
     $provider->shouldReceive('registerTelescope')->once();
-    
+
     // 调用要测试的方法
     $provider->registeringPackage();
 });
@@ -135,34 +139,34 @@ test('计划任务中 Telescope 清理命令正确注册', function () {
 
 test('bootingPackage 方法正确设置了所有启动项', function () {
     // 模拟 Application 对象
-    $app = Mockery::mock(Application::class . ',' . CachesConfiguration::class);
-    
+    $app = Mockery::mock(Application::class.','.CachesConfiguration::class);
+
     // 需要同时模拟 callAfterResolving 方法
     $app->shouldReceive('afterResolving')
         ->with(Schedule::class, Mockery::type('Closure'))
         ->once();
-    
+
     $app->shouldReceive('resolved')
         ->with(Schedule::class)
         ->andReturn(false)
         ->once();
-    
+
     // 添加配置相关方法的模拟
     $config = Mockery::mock('config');
     $config->shouldReceive('get')
         ->with('prism.immutable_date', true)
         ->andReturn(true);
     $app->shouldReceive('make')->with('config')->andReturn($config);
-    
+
     // 创建一个部分 mock，只 mock registerTelescopePruneCommand 方法
     $provider = new PrismServiceProvider($app);
-    
+
     // 执行要测试的方法
     $provider->bootingPackage();
-    
+
     // 验证 JsonResource 包装被禁用
     expect(\Illuminate\Http\Resources\Json\JsonResource::$wrap)->toBeNull();
-    
+
     // 验证使用的是 CarbonImmutable
     expect(\Illuminate\Support\Facades\Date::now())->toBeInstanceOf(\Carbon\CarbonImmutable::class);
 });
@@ -172,7 +176,7 @@ test('configurePackage 方法正确配置了包', function () {
     $packageMock->shouldReceive('name')->with('laravel-prism')->once()->andReturnSelf();
     $packageMock->shouldReceive('hasConfigFile')->with('prism')->once()->andReturnSelf();
     $packageMock->shouldReceive('hasCommand')->with(\Abe\Prism\Commands\InstallCommand::class)->once()->andReturnSelf();
-    
+
     $provider = new PrismServiceProvider($this->app);
     $provider->configurePackage($packageMock);
 });

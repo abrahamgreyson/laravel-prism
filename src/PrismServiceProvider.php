@@ -47,8 +47,6 @@ class PrismServiceProvider extends PackageServiceProvider
 
     /**
      * Register Telescope services in local environment.
-     *
-     * @return void
      */
     public function registerTelescope(): void
     {
