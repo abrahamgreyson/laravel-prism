@@ -34,7 +34,7 @@ test('snowflake 服务成功注册', function () {
 
 test('在 local 环境下使用 Mockery 测试 Telescope 注册', function () {
     // 创建一个模拟应用，设置为 local 环境
-    $app = Mockery::mock(Application::class.','.CachesConfiguration::class);
+    $app = Mockery::mock(Application::class . ',' . CachesConfiguration::class);
     $app->shouldReceive('environment')->with('local')->andReturn(true);
     $app->shouldReceive('register')->with(TelescopeServiceProvider::class)->once();
     $app->shouldReceive('register')->with(\App\Providers\TelescopeServiceProvider::class)->once();
@@ -46,10 +46,10 @@ test('在 local 环境下使用 Mockery 测试 Telescope 注册', function () {
             return 0;
         }
     });
-    
+
     // 添加对 configurationIsCached 方法的期望
     $app->shouldReceive('configurationIsCached')->andReturn(false);
-    
+
     // 添加配置相关方法的模拟
     $config = Mockery::mock('config');
     $config->shouldReceive('get')->andReturn([]);
@@ -61,7 +61,7 @@ test('在 local 环境下使用 Mockery 测试 Telescope 注册', function () {
 });
 
 test('在 production 环境下使用 Mockery 测试 Telescope 不被注册', function () {
-    $app = Mockery::mock(Application::class.','.CachesConfiguration::class);
+    $app = Mockery::mock(Application::class . ',' . CachesConfiguration::class);
     $app->shouldReceive('environment')->with('local')->andReturn(false);
     $app->shouldNotReceive('register')->with(TelescopeServiceProvider::class);
     $app->shouldNotReceive('register')->with(\App\Providers\TelescopeServiceProvider::class);
@@ -73,10 +73,10 @@ test('在 production 环境下使用 Mockery 测试 Telescope 不被注册', fun
             return 0;
         }
     });
-    
+
     // 添加对 configurationIsCached 方法的期望
     $app->shouldReceive('configurationIsCached')->andReturn(false);
-    
+
     // 添加配置相关方法的模拟
     $config = Mockery::mock('config');
     $config->shouldReceive('get')->andReturn([]);
@@ -135,7 +135,7 @@ test('服务提供者启动时注册 Schedule 回调', function () {
     // 不测试实际调用，而是测试回调是否正确注册
 
     // 模拟 Application 对象
-    $app = Mockery::mock(Application::class);
+    $app = Mockery::mock(Application::class . ',' . CachesConfiguration::class);
     $capturedCallback = null;
 
     // 需要同时模拟 afterResolving 方法，因为 callAfterResolving 内部会调用它
@@ -149,20 +149,46 @@ test('服务提供者启动时注册 Schedule 回调', function () {
         ->andReturn(false)
         ->once();
 
-    // 执行启动方法
-    $provider = new PrismServiceProvider($app);
-    $provider->boot();
+    // 添加对 configurationIsCached 方法的期望
+    $app->shouldReceive('configurationIsCached')->andReturn(false);
 
-    // 由于我们只测试方法是否被调用，所以不需要验证回调内容
+    // 对 environment 期望
+    $app->shouldReceive('environment')->with('local')->andReturn(true);
+
+    // 添加配置相关方法的模拟
+    $config = Mockery::mock('config');
+    $config->shouldReceive('get')->withAnyArgs()->andReturn([]);
+    $config->shouldReceive('set')->withAnyArgs()->andReturn($config);
+    $app->shouldReceive('make')->with('config')->andReturn($config);
+    
+    // 添加对 register 方法的模拟
+    $app->shouldReceive('register')->andReturnSelf();
+
+    // 模拟 runningInConsole 方法
+    $app->shouldReceive('runningInConsole')->andReturn(false);
+    
+    // 为 registerSnowflake 方法添加必要的期望
+    $app->shouldReceive('singleton')
+        ->withArgs(['snowflake', Mockery::type('Closure')])
+        ->once();
+    
+    $app->shouldReceive('get')
+        ->with('cache.store')
+        ->andReturn(new class {
+            public function remember() { return 0; }
+        });
+
+    // 执行启动方法前先注册服务提供者
+    $provider = new PrismServiceProvider($app);
+    $provider->register();
+    $provider->boot();
 });
 
 test('JsonResource 包装被禁用', function () {
     expect(\Illuminate\Http\Resources\Json\JsonResource::$wrap)->toBeNull();
 });
 
-test('使用 CarbonImmutable 作为默认日期类', function () {
-    expect(\Illuminate\Support\Facades\Date::now())->toBeInstanceOf(\Carbon\CarbonImmutable::class);
-});
+test('使用 CarbonImmutable 作为默认日期类', function () { expect(\Illuminate\Support\Facades\Date::now())->toBeInstanceOf(\Carbon\CarbonImmutable::class); });
 
 afterEach(function () {
     Mockery::close();
