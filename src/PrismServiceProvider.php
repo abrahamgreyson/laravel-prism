@@ -5,8 +5,10 @@ namespace Abe\Prism;
 use Abe\Prism\Commands\InstallCommand;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -70,6 +72,22 @@ class PrismServiceProvider extends PackageServiceProvider
         // 根据配置决定是否使用不可变日期
         if (config('prism.immutable_date', true)) {
             Date::use(CarbonImmutable::class);
+        }
+
+        // 根据配置决定是否启用模型严格模式
+        if (config('prism.model_strict', true)) {
+            // 在非生产环境启用所有严格检查，生产环境不启用懒加载检查
+            Model::shouldBeStrict(!app()->isProduction());
+        }
+
+        // 根据配置决定是否解除模型保护
+        if (config('prism.unguard_models', true)) {
+            Model::unguard();
+        }
+
+        // 根据配置决定是否禁止破坏性命令（仅在生产环境）
+        if (config('prism.prohibit_destructive_commands', true)) {
+            DB::prohibitDestructiveCommands(app()->isProduction());
         }
 
         // 注册计划任务

@@ -12,6 +12,11 @@ trait HasResponse
         return Response::success($data, $message, $code);
     }
 
+    public function ok(array $data = [], string $message = '', int $code = 200): JsonResponse
+    {
+        return Response::ok($data, $message, $code);
+    }
+
     /**
      * Returns a failure response.
      *

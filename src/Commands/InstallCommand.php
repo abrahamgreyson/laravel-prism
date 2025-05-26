@@ -62,6 +62,9 @@ class InstallCommand extends Command
         $options = [
             'immutable_date' => true,
             'unified_response' => true,
+            'model_strict' => true,
+            'unguard_models' => true,
+            'prohibit_destructive_commands' => true,
         ];
 
         // 如果是非交互模式，直接返回默认选项
@@ -72,7 +75,10 @@ class InstallCommand extends Command
         // 定义功能选项
         $features = [
             'immutable_date' => '不可变日期 (Immutable Date) - 使模型日期字段和 Date Facade 返回 Carbon 不可变实例',
-            'unified_response' => '统一格式的响应',
+            'unified_response' => '统一格式的响应 (Unified Response) - 提供标准化的 API 响应格式',
+            'model_strict' => '模型严格模式 (Model Strict) - 防止懒加载、静默丢弃属性等问题',
+            'unguard_models' => '解除模型保护 (Unguard Models) - 无需定义 $fillable 数组',
+            'prohibit_destructive_commands' => '禁止破坏性命令 (Prohibit Destructive Commands) - 在生产环境禁止危险的数据库命令',
         ];
 
         // 使用 Laravel Prompts 的 multiselect
@@ -107,16 +113,15 @@ class InstallCommand extends Command
         if (File::exists($configPath)) {
             $configContent = File::get($configPath);
 
-            // 修改 immutable_date 选项
-            $immutableValue = $options['immutable_date'] ? 'true' : 'false';
-            $configContent = preg_replace(
-                "/('immutable_date'\s*=>\s*)(true|false)/",
-                "$1$immutableValue",
-                $configContent
-            );
-
-            // 修改其他选项
-            // ...
+            // 修改各项配置选项
+            foreach ($options as $key => $value) {
+                $boolValue = $value ? 'true' : 'false';
+                $configContent = preg_replace(
+                    "/('$key'\s*=>\s*)(true|false)/",
+                    "$1$boolValue",
+                    $configContent
+                );
+            }
 
             // 写回配置文件
             File::put($configPath, $configContent);
