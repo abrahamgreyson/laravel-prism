@@ -225,22 +225,55 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
     public function updateConfiguration(string $configContent, array $options): string
     {
         $prefix = $this->getConfigPrefix();
-
-        // 更新配置选项
+        $extensionName = $this->getName();
+        
+        // 获取扩展的默认配置
+        $defaultConfig = $this->getExtensionDefaultConfig();
+        
+        // 合并用户选择的选项和默认配置
+        $configToUpdate = [];
+        
+        // 首先添加默认配置
+        foreach ($defaultConfig as $key => $value) {
+            $configToUpdate[$key] = $value;
+        }
+        
+        // 然后用用户选择的选项覆盖默认配置
         foreach ($options as $key => $value) {
             if (str_starts_with($key, $prefix)) {
                 $configKey = str_replace($prefix, '', $key);
-                $valueString = is_bool($value) ? ($value ? 'true' : 'false') : "'{$value}'";
-                
-                $configContent = preg_replace(
-                    "/'{$configKey}'\s*=>\s*[^,\n]+/",
-                    "'{$configKey}' => {$valueString}",
-                    $configContent
-                );
+                $configToUpdate[$configKey] = $value;
+            }
+        }
+        
+        // 更新配置文件内容
+        foreach ($configToUpdate as $configKey => $value) {
+            $valueString = is_bool($value) ? ($value ? 'true' : 'false') : "'{$value}'";
+            
+            // 使用更精确的正则表达式来匹配嵌套配置
+            $pattern = "/('$configKey'\s*=>\s*)[^,\n\]]+/";
+            $replacement = "'$configKey' => $valueString";
+            
+            // 只在扩展配置块内进行替换
+            $sectionPattern = "/('$extensionName'\s*=>\s*\[[^\]]*?)('$configKey'\s*=>\s*[^,\n\]]+)([^\]]*\])/s";
+            if (preg_match($sectionPattern, $configContent)) {
+                $configContent = preg_replace($sectionPattern, "$1'$configKey' => $valueString$3", $configContent);
+            } else {
+                // 如果没有找到特定的扩展配置块，尝试全局匹配（向后兼容）
+                $configContent = preg_replace($pattern, $replacement, $configContent);
             }
         }
 
         return $configContent;
+    }
+    
+    /**
+     * 获取扩展的默认配置（子类可覆盖）
+     */
+    protected function getExtensionDefaultConfig(): array
+    {
+        // 默认实现，子类应该覆盖此方法
+        return [];
     }
 
     /**

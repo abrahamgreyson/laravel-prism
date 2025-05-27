@@ -26,8 +26,10 @@ class LaravelConfigurator
      */
     protected static function configureJsonResources(): void
     {
-        // 禁用资源包装
-        JsonResource::withoutWrapping();
+        // 根据配置决定是否禁用资源包装
+        if (config('prism.json_resource_without_wrapping', true)) {
+            JsonResource::withoutWrapping();
+        }
     }
 
     /**

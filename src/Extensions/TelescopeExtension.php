@@ -21,7 +21,7 @@ class TelescopeExtension extends AbstractExtension
     {
         return array_merge(parent::getDefaultConfig(), [
             'auto_register' => true,
-            'environment' => 'dev',
+            'environment' => 'local',
             'auto_prune' => true,
             'prune_hours' => 24,
         ]);

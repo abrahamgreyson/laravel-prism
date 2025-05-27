@@ -94,7 +94,8 @@ class ExtensionInstallerManager
         $selectedKeys = multiselect(
             '请选择要安装的第三方包：',
             $packages,
-            [] // 默认不选择任何包
+            [], // 默认不选择任何包
+            scroll: 10
         );
 
         // 更新选项

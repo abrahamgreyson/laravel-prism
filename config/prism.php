@@ -3,6 +3,17 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | JSON 资源禁用包装 (JSON Resource Without Wrapping)
+    |--------------------------------------------------------------------------
+    |
+    | 启用后，JSON 资源将不会被包装在 'data' 键中，
+    | 直接返回资源内容，提供更简洁的 API 响应格式。
+    |
+    */
+    'json_resource_without_wrapping' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | 不可变日期 (Immutable Date)
     |--------------------------------------------------------------------------
     |
@@ -67,15 +78,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | 配置 Laravel Telescope 的安装和使用。
-    | - 'auto_install': 是否在安装时自动引导安装 Telescope
-    | - 'environment': 安装环境 ('dev' 仅开发环境, 'all' 所有环境)
     | - 'auto_register': 是否自动注册 Telescope 服务提供者
+    | - 'environment': 安装环境 ('local' 仅本地环境, 'production' 仅生产环境, 'all' 所有环境)
     | - 'auto_prune': 是否自动配置数据清理任务
     |
     */
     'telescope' => [
-        'auto_install' => false,
-        'environment' => 'dev', // 'dev' 或 'all'
+        'environment' => 'local', // 'local', 'production' 或 'all'
         'auto_register' => true,
         'auto_prune' => true,
         'prune_hours' => 24,

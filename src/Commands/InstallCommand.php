@@ -72,6 +72,7 @@ class InstallCommand extends Command
         
         // 默认选项
         $options = [
+            'json_resource_without_wrapping' => true,
             'immutable_date' => true,
             'model_strict' => true,
             'unguard_models' => true,
@@ -86,6 +87,7 @@ class InstallCommand extends Command
 
         // 定义功能选项
         $features = [
+            'json_resource_without_wrapping' => 'JSON 资源禁用包装 (JSON Resource Without Wrapping) - 移除 API 响应的 data 包装',
             'immutable_date' => '不可变日期 (Immutable Date) - 使模型日期字段和 Date Facade 返回 Carbon 不可变实例',
             'model_strict' => '模型严格模式 (Model Strict) - 防止懒加载、静默丢弃属性等问题',
             'unguard_models' => '解除模型保护 (Unguard Models) - 无需定义 $fillable 数组',
@@ -93,11 +95,12 @@ class InstallCommand extends Command
             'unified_response' => '统一格式的响应 (Unified Response) - 提供标准化的 API 响应格式',
         ];
 
-        // 使用 Laravel Prompts 的 multiselect
+        // 使用 Laravel Prompts 的 multiselect，设置 scroll 为显示所有选项
         $selectedKeys = multiselect(
             '请选择要启用的 Laravel 行为配置：',
             $features,
-            array_keys($options)
+            array_keys($options),
+            scroll: 10
         );
 
         // 更新选项
@@ -167,7 +170,7 @@ class InstallCommand extends Command
             $configContent = File::get($configPath);
 
             // 修改基础配置选项
-            $basicOptions = ['immutable_date', 'unified_response', 'model_strict', 'unguard_models', 'prohibit_destructive_commands'];
+            $basicOptions = ['json_resource_without_wrapping', 'immutable_date', 'unified_response', 'model_strict', 'unguard_models', 'prohibit_destructive_commands'];
             foreach ($basicOptions as $key) {
                 if (isset($options[$key])) {
                     $boolValue = $options[$key] ? 'true' : 'false';
