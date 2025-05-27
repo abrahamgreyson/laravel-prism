@@ -55,6 +55,14 @@ class TelescopeInstaller extends AbstractExtensionInstaller
     }
 
     /**
+     * 获取扩展类名
+     */
+    public function getExtensionClass(): ?string
+    {
+        return 'Abe\\Prism\\Extensions\\TelescopeExtension';
+    }
+
+    /**
      * 获取安装选项
      */
     public function getInstallOptions(): array

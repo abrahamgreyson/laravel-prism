@@ -3,6 +3,7 @@
 namespace Abe\Prism\Commands;
 
 use Abe\Prism\Support\ExtensionInstallerManager;
+use Abe\Prism\Support\ExtensionStateManager;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,6 +19,14 @@ class InstallCommand extends Command
     protected $signature = 'prism:install';
 
     protected $description = 'Install the Prism package';
+
+    protected ExtensionStateManager $stateManager;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->stateManager = new ExtensionStateManager();
+    }
 
     /**
      * 配置命令
@@ -142,7 +151,18 @@ class InstallCommand extends Command
             
             try {
                 $installer->install($output, $context);
+                
+                // 记录安装状态
+                $this->stateManager->recordInstallation('telescope', [
+                    'installation_method' => 'prism',
+                    'configuration' => [
+                        'environment' => $options['telescope_environment'],
+                        'auto_register' => true,
+                    ]
+                ]);
+                
                 info('🎉 Telescope 安装完成！');
+                note('扩展已被 Prism 管理，可使用 prism:list 查看状态');
             } catch (\Exception $e) {
                 $output->writeln("<error>❌ Telescope 安装失败: {$e->getMessage()}</error>");
                 

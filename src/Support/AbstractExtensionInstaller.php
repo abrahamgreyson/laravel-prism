@@ -25,6 +25,11 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
     abstract protected function getServiceProviderClass(): string;
 
     /**
+     * 获取扩展类名（用于配置访问）
+     */
+    abstract public function getExtensionClass(): ?string;
+
+    /**
      * 获取安装步骤
      */
     abstract protected function getInstallSteps(array $options): array;

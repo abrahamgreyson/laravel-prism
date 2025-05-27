@@ -3,6 +3,14 @@
 namespace Abe\Prism;
 
 use Abe\Prism\Commands\InstallCommand;
+use Abe\Prism\Commands\ListCommand;
+use Abe\Prism\Commands\StatusCommand;
+use Abe\Prism\Commands\DisableCommand;
+use Abe\Prism\Commands\EnableCommand;
+use Abe\Prism\Commands\UninstallCommand;
+use Abe\Prism\Commands\DoctorCommand;
+use Abe\Prism\Commands\CleanCommand;
+use Abe\Prism\Commands\ResetCommand;
 use Abe\Prism\Extensions\TelescopeExtension;
 use Abe\Prism\Support\ExtensionManager;
 use Abe\Prism\Support\LaravelConfigurator;
@@ -24,7 +32,17 @@ class PrismServiceProvider extends PackageServiceProvider
 
         $package->name('laravel-prism')
             ->hasConfigFile('prism')
-            ->hasCommand(InstallCommand::class);
+            ->hasCommands([
+                InstallCommand::class,
+                ListCommand::class,
+                StatusCommand::class,
+                DisableCommand::class,
+                EnableCommand::class,
+                UninstallCommand::class,
+                DoctorCommand::class,
+                CleanCommand::class,
+                ResetCommand::class,
+            ]);
     }
 
     public function registeringPackage(): void
