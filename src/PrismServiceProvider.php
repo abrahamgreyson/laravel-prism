@@ -3,17 +3,17 @@
 namespace Abe\Prism;
 
 use Abe\Prism\Commands\InstallCommand;
-use Carbon\CarbonImmutable;
+use Abe\Prism\Extensions\TelescopeExtension;
+use Abe\Prism\Support\ExtensionManager;
+use Abe\Prism\Support\LaravelConfigurator;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\DB;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class PrismServiceProvider extends PackageServiceProvider
 {
+    protected ExtensionManager $extensionManager;
+
     public function configurePackage(Package $package): void
     {
         /*
@@ -30,13 +30,27 @@ class PrismServiceProvider extends PackageServiceProvider
     public function registeringPackage(): void
     {
         $this->registerSnowflake();
-        $this->registerTelescope();
+        $this->registerExtensionManager();
+    }
+
+    public function bootingPackage(): void
+    {
+        // 配置 Laravel 默认行为
+        LaravelConfigurator::configure();
+
+        // 启动所有扩展
+        $this->extensionManager->bootAll();
+
+        // 注册计划任务
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            $this->extensionManager->scheduleAll($schedule);
+        });
     }
 
     /**
      * Register snowflake instance.
      */
-    public function registerSnowflake(): void
+    protected function registerSnowflake(): void
     {
         // snowflake setting
         $this->app->singleton('snowflake', function ($app) {
@@ -48,60 +62,29 @@ class PrismServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * Register Telescope services in local environment.
+     * Register extension manager and all extensions.
      */
-    public function registerTelescope(): void
+    protected function registerExtensionManager(): void
     {
-        // Telescope can be run only in local
-        if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
-            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
-        }
-        // Telescope filter
-        if ($this->app->environment('local') && class_exists(\App\Providers\TelescopeServiceProvider::class)) {
-            $this->app->register(\App\Providers\TelescopeServiceProvider::class);
-        }
-    }
-
-    public function bootingPackage(): void
-    {
-        // disabled resource wrapping
-        JsonResource::withoutWrapping();
-
-        // 根据配置决定是否使用不可变日期
-        if (config('prism.immutable_date', true)) {
-            Date::use(CarbonImmutable::class);
-        }
-
-        // 根据配置决定是否启用模型严格模式
-        if (config('prism.model_strict', true)) {
-            // 在非生产环境启用所有严格检查，生产环境不启用懒加载检查
-            Model::shouldBeStrict(!app()->isProduction());
-        }
-
-        // 根据配置决定是否解除模型保护
-        if (config('prism.unguard_models', true)) {
-            Model::unguard();
-        }
-
-        // 根据配置决定是否禁止破坏性命令（仅在生产环境）
-        if (config('prism.prohibit_destructive_commands', true)) {
-            DB::prohibitDestructiveCommands(app()->isProduction());
-        }
-
-        // 注册计划任务
-        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
-            $this->registerTelescopePruneCommand($schedule);
-        });
+        $this->extensionManager = new ExtensionManager($this->app);
+        
+        // 注册所有扩展
+        $this->registerExtensions();
+        
+        // 注册所有扩展的服务
+        $this->extensionManager->registerAll();
     }
 
     /**
-     * 注册 Telescope 清理命令到计划任务
+     * Register all available extensions.
      */
-    protected function registerTelescopePruneCommand(Schedule $schedule): void
+    protected function registerExtensions(): void
     {
-        // 检查是否安装并注册了 Telescope
-        if (class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
-            $schedule->command('telescope:prune --hours=24')->daily()->at('02:00');
-        }
+        // 注册 Telescope 扩展
+        $this->extensionManager->register(new TelescopeExtension());
+        
+        // 未来可以在这里添加更多扩展
+        // $this->extensionManager->register(new OctaneExtension());
+        // $this->extensionManager->register(new HorizonExtension());
     }
 }

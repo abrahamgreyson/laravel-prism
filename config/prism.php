@@ -60,4 +60,24 @@ return [
     |
     */
     'prohibit_destructive_commands' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Telescope 配置 (Telescope Configuration)
+    |--------------------------------------------------------------------------
+    |
+    | 配置 Laravel Telescope 的安装和使用。
+    | - 'auto_install': 是否在安装时自动引导安装 Telescope
+    | - 'environment': 安装环境 ('dev' 仅开发环境, 'all' 所有环境)
+    | - 'auto_register': 是否自动注册 Telescope 服务提供者
+    | - 'auto_prune': 是否自动配置数据清理任务
+    |
+    */
+    'telescope' => [
+        'auto_install' => false,
+        'environment' => 'dev', // 'dev' 或 'all'
+        'auto_register' => true,
+        'auto_prune' => true,
+        'prune_hours' => 24,
+    ],
 ];
