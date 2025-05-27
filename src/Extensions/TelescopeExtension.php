@@ -43,7 +43,7 @@ class TelescopeExtension extends AbstractExtension
     public function schedule(Schedule $schedule): void
     {
         $config = $this->getConfig();
-        
+
         // 检查是否启用自动清理
         if ($config['auto_prune']) {
             $hours = $config['prune_hours'];

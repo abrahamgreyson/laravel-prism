@@ -51,7 +51,7 @@ class LaravelConfigurator
         // 根据配置决定是否启用模型严格模式
         if (config('prism.model_strict', true)) {
             // 在非生产环境启用所有严格检查，生产环境不启用懒加载检查
-            Model::shouldBeStrict(!app()->isProduction());
+            Model::shouldBeStrict(! app()->isProduction());
         }
 
         // 根据配置决定是否解除模型保护

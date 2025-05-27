@@ -33,12 +33,12 @@ class OctaneExtension extends AbstractExtension
     public function schedule(Schedule $schedule): void
     {
         $config = $this->getConfig();
-        
+
         // 示例：定期重启 Octane 服务器（如果需要）
         if ($config['auto_restart']) {
             $interval = $config['restart_interval'];
             $command = $schedule->command('octane:reload');
-            
+
             match ($interval) {
                 'hourly' => $command->hourly(),
                 'daily' => $command->daily(),

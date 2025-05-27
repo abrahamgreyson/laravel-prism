@@ -2,8 +2,8 @@
 
 namespace Abe\Prism\Contracts;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Foundation\Application;
 
 interface Extension
 {

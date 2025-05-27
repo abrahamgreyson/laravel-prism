@@ -5,7 +5,6 @@ namespace Abe\Prism\Installers;
 use Abe\Prism\Support\AbstractExtensionInstaller;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\select;
 
@@ -87,7 +86,7 @@ class OctaneInstaller extends AbstractExtensionInstaller
     protected function getInstallSteps(array $options): array
     {
         $serverType = $options['octane_server'] ?? 'swoole';
-        
+
         return [
             'composer require laravel/octane',
             'php artisan octane:install',
@@ -102,7 +101,7 @@ class OctaneInstaller extends AbstractExtensionInstaller
     protected function executeInstallSteps(OutputInterface $output, array $options): bool
     {
         // 1. 安装 Octane 包
-        if (!$this->installComposerPackage($output, $options)) {
+        if (! $this->installComposerPackage($output, $options)) {
             return false;
         }
 
@@ -110,7 +109,7 @@ class OctaneInstaller extends AbstractExtensionInstaller
         $this->reloadComposerAutoloader($output);
 
         // 3. 运行 octane:install
-        if (!$this->runOctaneInstall($output, $options)) {
+        if (! $this->runOctaneInstall($output, $options)) {
             return false;
         }
 
@@ -126,7 +125,7 @@ class OctaneInstaller extends AbstractExtensionInstaller
 
         $serverType = $options['octane_server'] ?? 'swoole';
         $command = "php artisan octane:install --server={$serverType}";
-        
+
         $output->writeln("<comment>执行: {$command}</comment>");
 
         try {
@@ -134,20 +133,21 @@ class OctaneInstaller extends AbstractExtensionInstaller
 
             if ($success) {
                 info('✅ Octane 安装成功！');
-                
+
                 if ($serverType === 'swoole') {
                     info('💡 请确保已安装 Swoole PHP 扩展');
                     info('💡 可以使用 "php artisan octane:start" 启动服务器');
                 } else {
                     info('💡 可以使用 "php artisan octane:start" 启动服务器');
                 }
-                
+
                 return true;
             } else {
                 return false;
             }
         } catch (\Exception $e) {
             $output->writeln("<comment>Octane 安装失败: {$e->getMessage()}</comment>");
+
             return false;
         }
     }
@@ -163,7 +163,7 @@ class OctaneInstaller extends AbstractExtensionInstaller
         info('');
         info('1. ✅ composer require laravel/octane (已完成)');
         info("2. ❌ php artisan octane:install --server={$serverType} (需要执行)");
-        
+
         if ($serverType === 'swoole') {
             info('3. ⏳ 安装 Swoole PHP 扩展:');
             info('   - Ubuntu/Debian: sudo apt-get install php-swoole');
@@ -172,7 +172,7 @@ class OctaneInstaller extends AbstractExtensionInstaller
         } else {
             info('3. ⏳ RoadRunner 二进制文件将在执行 octane:install 时自动下载');
         }
-        
+
         info('');
         info('💡 完成后使用 "php artisan octane:start" 启动高性能服务器');
     }

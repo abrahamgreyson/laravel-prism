@@ -28,8 +28,8 @@ class ExtensionInstallerManager
     protected function registerDefaultInstallers(): void
     {
         // 自动注册 Telescope 安装器
-        $this->register(new \Abe\Prism\Installers\TelescopeInstaller());
-        
+        $this->register(new \Abe\Prism\Installers\TelescopeInstaller);
+
         // 如果有其他安装器，可以在这里添加
         // $this->register(new \Abe\Prism\Installers\OctaneInstaller());
     }
@@ -40,6 +40,7 @@ class ExtensionInstallerManager
     public function register(ExtensionInstaller $installer): self
     {
         $this->installers[$installer->getName()] = $installer;
+
         return $this;
     }
 
@@ -80,7 +81,7 @@ class ExtensionInstallerManager
         }
 
         // 如果是非交互模式，直接返回默认选项
-        if (!$isInteractive) {
+        if (! $isInteractive) {
             return $options;
         }
 
@@ -121,7 +122,7 @@ class ExtensionInstallerManager
     {
         foreach ($this->installers as $installer) {
             $installKey = "{$installer->getName()}_install";
-            
+
             if ($options[$installKey] ?? false) {
                 $installer->install($output, $options);
             }

@@ -2,8 +2,8 @@
 
 namespace Abe\Prism\Commands;
 
-use Abe\Prism\Support\ExtensionStateManager;
 use Abe\Prism\Support\ExtensionInstallerManager;
+use Abe\Prism\Support\ExtensionStateManager;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Helper\Table;
 
@@ -13,16 +13,18 @@ use function Laravel\Prompts\warning;
 class ListCommand extends Command
 {
     protected $signature = 'prism:list {--managed : 只显示 Prism 管理的扩展} {--enabled : 只显示已启用的扩展}';
+
     protected $description = '列出所有扩展及其状态';
 
     protected ExtensionStateManager $stateManager;
+
     protected ExtensionInstallerManager $installerManager;
 
     public function __construct()
     {
         parent::__construct();
-        $this->stateManager = new ExtensionStateManager();
-        $this->installerManager = new ExtensionInstallerManager();
+        $this->stateManager = new ExtensionStateManager;
+        $this->installerManager = new ExtensionInstallerManager;
     }
 
     public function handle(): int
@@ -30,9 +32,10 @@ class ListCommand extends Command
         $this->displayHeader();
 
         $extensions = $this->getExtensionsToDisplay();
-        
+
         if (empty($extensions)) {
             $this->displayEmptyMessage();
+
             return self::SUCCESS;
         }
 
@@ -65,7 +68,7 @@ class ListCommand extends Command
         foreach ($availableInstallers as $installer) {
             $name = $installer->getName();
             $state = $states[$name] ?? [];
-            
+
             $extensionInfo = [
                 'name' => $name,
                 'display_name' => $installer->getDisplayName(),
@@ -79,7 +82,7 @@ class ListCommand extends Command
             ];
 
             // 应用过滤器
-            if ($this->option('managed') && !$extensionInfo['managed_by_prism']) {
+            if ($this->option('managed') && ! $extensionInfo['managed_by_prism']) {
                 continue;
             }
 
@@ -104,7 +107,7 @@ class ListCommand extends Command
             '状态',
             '管理方式',
             '版本',
-            '描述'
+            '描述',
         ]);
 
         foreach ($extensions as $ext) {
@@ -113,7 +116,7 @@ class ListCommand extends Command
                 $this->formatStatus($ext['status']),
                 $this->formatManagement($ext['managed_by_prism'], $ext['installed']),
                 $ext['version'] ?: 'N/A',
-                $this->truncateDescription($ext['description'])
+                $this->truncateDescription($ext['description']),
             ]);
         }
 
@@ -140,12 +143,12 @@ class ListCommand extends Command
      */
     protected function formatManagement(bool $managedByPrism, bool $installed): string
     {
-        if (!$installed) {
+        if (! $installed) {
             return '<fg=gray>-</>';
         }
 
-        return $managedByPrism 
-            ? '<fg=green>Prism</>' 
+        return $managedByPrism
+            ? '<fg=green>Prism</>'
             : '<fg=yellow>手动</>';
     }
 
@@ -154,8 +157,8 @@ class ListCommand extends Command
      */
     protected function truncateDescription(string $description, int $length = 40): string
     {
-        return mb_strlen($description) > $length 
-            ? mb_substr($description, 0, $length) . '...'
+        return mb_strlen($description) > $length
+            ? mb_substr($description, 0, $length).'...'
             : $description;
     }
 
@@ -165,9 +168,9 @@ class ListCommand extends Command
     protected function displaySummary(array $extensions): void
     {
         $total = count($extensions);
-        $managed = count(array_filter($extensions, fn($ext) => $ext['managed_by_prism']));
-        $enabled = count(array_filter($extensions, fn($ext) => $ext['status'] === 'enabled'));
-        $manual = count(array_filter($extensions, fn($ext) => $ext['status'] === 'manual'));
+        $managed = count(array_filter($extensions, fn ($ext) => $ext['managed_by_prism']));
+        $enabled = count(array_filter($extensions, fn ($ext) => $ext['status'] === 'enabled'));
+        $manual = count(array_filter($extensions, fn ($ext) => $ext['status'] === 'manual'));
 
         $this->line("📊 <fg=cyan>总计</> {$total} 个扩展");
         $this->line("   <fg=green>Prism 管理:</> {$managed}");

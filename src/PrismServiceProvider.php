@@ -2,15 +2,15 @@
 
 namespace Abe\Prism;
 
+use Abe\Prism\Commands\CleanCommand;
+use Abe\Prism\Commands\DisableCommand;
+use Abe\Prism\Commands\DoctorCommand;
+use Abe\Prism\Commands\EnableCommand;
 use Abe\Prism\Commands\InstallCommand;
 use Abe\Prism\Commands\ListCommand;
-use Abe\Prism\Commands\StatusCommand;
-use Abe\Prism\Commands\DisableCommand;
-use Abe\Prism\Commands\EnableCommand;
-use Abe\Prism\Commands\UninstallCommand;
-use Abe\Prism\Commands\DoctorCommand;
-use Abe\Prism\Commands\CleanCommand;
 use Abe\Prism\Commands\ResetCommand;
+use Abe\Prism\Commands\StatusCommand;
+use Abe\Prism\Commands\UninstallCommand;
 use Abe\Prism\Extensions\TelescopeExtension;
 use Abe\Prism\Support\ExtensionManager;
 use Abe\Prism\Support\LaravelConfigurator;
@@ -85,10 +85,10 @@ class PrismServiceProvider extends PackageServiceProvider
     protected function registerExtensionManager(): void
     {
         $this->extensionManager = new ExtensionManager($this->app);
-        
+
         // 注册所有扩展
         $this->registerExtensions();
-        
+
         // 注册所有扩展的服务
         $this->extensionManager->registerAll();
     }
@@ -99,8 +99,8 @@ class PrismServiceProvider extends PackageServiceProvider
     protected function registerExtensions(): void
     {
         // 注册 Telescope 扩展
-        $this->extensionManager->register(new TelescopeExtension());
-        
+        $this->extensionManager->register(new TelescopeExtension);
+
         // 未来可以在这里添加更多扩展
         // $this->extensionManager->register(new OctaneExtension());
         // $this->extensionManager->register(new HorizonExtension());

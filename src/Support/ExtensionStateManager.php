@@ -2,8 +2,8 @@
 
 namespace Abe\Prism\Support;
 
-use Illuminate\Support\Facades\File;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 
 class ExtensionStateManager
 {
@@ -21,7 +21,7 @@ class ExtensionStateManager
     protected function ensureStateDirectory(): void
     {
         $directory = dirname($this->stateFile);
-        if (!File::exists($directory)) {
+        if (! File::exists($directory)) {
             File::makeDirectory($directory, 0755, true);
         }
     }
@@ -31,11 +31,12 @@ class ExtensionStateManager
      */
     public function getAllStates(): array
     {
-        if (!File::exists($this->stateFile)) {
+        if (! File::exists($this->stateFile)) {
             return [];
         }
 
         $content = File::get($this->stateFile);
+
         return json_decode($content, true) ?: [];
     }
 
@@ -45,6 +46,7 @@ class ExtensionStateManager
     public function getState(string $extension): array
     {
         $states = $this->getAllStates();
+
         return $states[$extension] ?? [];
     }
 
@@ -54,6 +56,7 @@ class ExtensionStateManager
     public function isManagedByPrism(string $extension): bool
     {
         $state = $this->getState($extension);
+
         return $state['managed_by_prism'] ?? false;
     }
 
@@ -63,6 +66,7 @@ class ExtensionStateManager
     public function isEnabled(string $extension): bool
     {
         $state = $this->getState($extension);
+
         return ($state['status'] ?? 'disabled') === 'enabled';
     }
 
@@ -72,7 +76,7 @@ class ExtensionStateManager
     public function recordInstallation(string $extension, array $config = []): void
     {
         $states = $this->getAllStates();
-        
+
         $states[$extension] = [
             'managed_by_prism' => true,
             'installed_at' => Carbon::now()->toISOString(),
@@ -92,7 +96,7 @@ class ExtensionStateManager
     public function updateStatus(string $extension, string $status): void
     {
         $states = $this->getAllStates();
-        
+
         if (isset($states[$extension])) {
             $states[$extension]['status'] = $status;
             $states[$extension]['last_updated'] = Carbon::now()->toISOString();
@@ -106,7 +110,7 @@ class ExtensionStateManager
     public function updateConfiguration(string $extension, array $config): void
     {
         $states = $this->getAllStates();
-        
+
         if (isset($states[$extension])) {
             $states[$extension]['configuration'] = array_merge(
                 $states[$extension]['configuration'] ?? [],
@@ -133,6 +137,7 @@ class ExtensionStateManager
     public function getManagedExtensions(): array
     {
         $states = $this->getAllStates();
+
         return array_filter($states, function ($state) {
             return $state['managed_by_prism'] ?? false;
         });
@@ -144,6 +149,7 @@ class ExtensionStateManager
     public function getEnabledExtensions(): array
     {
         $states = $this->getAllStates();
+
         return array_filter($states, function ($state) {
             return ($state['status'] ?? 'disabled') === 'enabled';
         });
@@ -172,6 +178,7 @@ class ExtensionStateManager
         }
 
         $this->saveStates($states);
+
         return $cleaned;
     }
 
@@ -189,21 +196,21 @@ class ExtensionStateManager
     protected function getPackageVersion(string $extension): ?string
     {
         $composerLock = base_path('composer.lock');
-        if (!File::exists($composerLock)) {
+        if (! File::exists($composerLock)) {
             return null;
         }
 
         try {
             $lock = json_decode(File::get($composerLock), true);
             $packages = array_merge($lock['packages'] ?? [], $lock['packages-dev'] ?? []);
-            
+
             $packageMap = [
                 'telescope' => 'laravel/telescope',
                 // 添加其他扩展的包名映射
             ];
 
             $packageName = $packageMap[$extension] ?? null;
-            if (!$packageName) {
+            if (! $packageName) {
                 return null;
             }
 
@@ -230,6 +237,7 @@ class ExtensionStateManager
         ];
 
         $className = $classMap[$extension] ?? null;
+
         return $className && class_exists($className);
     }
 }

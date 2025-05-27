@@ -25,7 +25,7 @@ class InstallCommand extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->stateManager = new ExtensionStateManager();
+        $this->stateManager = new ExtensionStateManager;
     }
 
     /**
@@ -78,7 +78,7 @@ class InstallCommand extends Command
     protected function configureLaravelBehavior(InputInterface $input, OutputInterface $output): array
     {
         $output->writeln('<fg=blue>📝 步骤 1: 配置 Laravel 行为</>');
-        
+
         // 默认选项
         $options = [
             'json_resource_without_wrapping' => true,
@@ -126,9 +126,10 @@ class InstallCommand extends Command
     protected function configureThirdPartyPackages(InputInterface $input, OutputInterface $output): array
     {
         $output->writeln('<fg=blue>📦 步骤 2: 选择第三方包</>');
-        
+
         // 使用 ExtensionInstallerManager 配置选项
-        $installerManager = new ExtensionInstallerManager();
+        $installerManager = new ExtensionInstallerManager;
+
         return $installerManager->configurePackageOptions($input->isInteractive());
     }
 
@@ -137,8 +138,8 @@ class InstallCommand extends Command
      */
     protected function installThirdPartyPackages(InputInterface $input, OutputInterface $output, array $options): void
     {
-        $installerManager = new ExtensionInstallerManager();
-        
+        $installerManager = new ExtensionInstallerManager;
+
         // 安装 Telescope（如果选择）
         if ($options['telescope_install']) {
             $context = [
@@ -146,26 +147,26 @@ class InstallCommand extends Command
                 'force' => $input->getOption('force'),
                 'interactive' => $input->isInteractive(),
             ];
-            
+
             $installer = $installerManager->getInstaller('telescope');
-            
+
             try {
                 $installer->install($output, $context);
-                
+
                 // 记录安装状态
                 $this->stateManager->recordInstallation('telescope', [
                     'installation_method' => 'prism',
                     'configuration' => [
                         'environment' => $options['telescope_environment'],
                         'auto_register' => true,
-                    ]
+                    ],
                 ]);
-                
+
                 info('🎉 Telescope 安装完成！');
                 note('扩展已被 Prism 管理，可使用 prism:list 查看状态');
             } catch (\Exception $e) {
                 $output->writeln("<error>❌ Telescope 安装失败: {$e->getMessage()}</error>");
-                
+
                 // 显示手动安装步骤
                 $installer->showManualSteps($output, $context);
             }
@@ -203,7 +204,7 @@ class InstallCommand extends Command
             }
 
             // 使用 ExtensionInstallerManager 更新扩展配置
-            $installerManager = new ExtensionInstallerManager();
+            $installerManager = new ExtensionInstallerManager;
             foreach ($installerManager->getAvailableInstallers() as $installer) {
                 $configContent = $installer->updateConfiguration($configContent, $options);
             }
