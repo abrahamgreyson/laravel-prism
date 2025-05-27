@@ -3,8 +3,8 @@
 namespace Abe\Prism\Support;
 
 use Abe\Prism\Contracts\Extension;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Foundation\Application;
 
 class ExtensionManager
 {
@@ -26,6 +26,7 @@ class ExtensionManager
     public function register(Extension $extension): self
     {
         $this->extensions[$extension->getName()] = $extension;
+
         return $this;
     }
 

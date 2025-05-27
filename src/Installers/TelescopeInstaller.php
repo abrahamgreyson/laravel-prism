@@ -121,7 +121,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
     protected function executeInstallSteps(OutputInterface $output, array $options): bool
     {
         // 1. 安装 Telescope 包
-        if (!$this->installComposerPackage($output, $options)) {
+        if (! $this->installComposerPackage($output, $options)) {
             return false;
         }
 
@@ -129,7 +129,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
         $this->reloadComposerAutoloader($output);
 
         // 3. 运行 telescope:install
-        if (!$this->runTelescopeInstall($output)) {
+        if (! $this->runTelescopeInstall($output)) {
             return false;
         }
 
@@ -141,7 +141,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
             info('✅ Telescope 已配置为仅在本地环境通过 Prism 加载');
         } else {
             // Production 或 All 环境：运行数据库迁移
-            if (!$this->runMigrations($output)) {
+            if (! $this->runMigrations($output)) {
                 return false;
             }
         }
@@ -164,12 +164,14 @@ class TelescopeInstaller extends AbstractExtensionInstaller
 
             if ($success) {
                 info('✅ Telescope 初始化成功！');
+
                 return true;
             } else {
                 return false;
             }
         } catch (\Exception $e) {
             $output->writeln("<comment>Telescope 初始化失败: {$e->getMessage()}</comment>");
+
             return false;
         }
     }
@@ -189,13 +191,16 @@ class TelescopeInstaller extends AbstractExtensionInstaller
 
             if ($success) {
                 info('✅ 数据库迁移完成！');
+
                 return true;
             } else {
                 warning('⚠️ 数据库迁移失败，请手动运行: php artisan migrate');
+
                 return false;
             }
         } else {
             warning('⚠️ 请记得手动运行: php artisan migrate');
+
             return true; // 用户选择不迁移，但不算失败
         }
     }
@@ -207,7 +212,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
     {
         $composerPath = base_path('composer.json');
 
-        if (!File::exists($composerPath)) {
+        if (! File::exists($composerPath)) {
             return;
         }
 
@@ -215,25 +220,25 @@ class TelescopeInstaller extends AbstractExtensionInstaller
             $composer = json_decode(File::get($composerPath), true);
 
             // 确保 extra.laravel.dont-discover 存在
-            if (!isset($composer['extra'])) {
+            if (! isset($composer['extra'])) {
                 $composer['extra'] = [];
             }
-            if (!isset($composer['extra']['laravel'])) {
+            if (! isset($composer['extra']['laravel'])) {
                 $composer['extra']['laravel'] = [];
             }
-            if (!isset($composer['extra']['laravel']['dont-discover'])) {
+            if (! isset($composer['extra']['laravel']['dont-discover'])) {
                 $composer['extra']['laravel']['dont-discover'] = [];
             }
 
             // 添加 Telescope 到 dont-discover 列表
-            if (!in_array('laravel/telescope', $composer['extra']['laravel']['dont-discover'])) {
+            if (! in_array('laravel/telescope', $composer['extra']['laravel']['dont-discover'])) {
                 $composer['extra']['laravel']['dont-discover'][] = 'laravel/telescope';
 
                 File::put($composerPath, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
                 $output->writeln('<info>已配置 composer.json 的 dont-discover 设置。</info>');
             }
         } catch (\Exception $e) {
-            $output->writeln("<comment>无法自动配置 composer.json，请手动添加 Telescope 到 dont-discover 列表。</comment>");
+            $output->writeln('<comment>无法自动配置 composer.json，请手动添加 Telescope 到 dont-discover 列表。</comment>');
         }
     }
 
@@ -244,37 +249,39 @@ class TelescopeInstaller extends AbstractExtensionInstaller
     {
         $providersPath = base_path('bootstrap/providers.php');
 
-        if (!File::exists($providersPath)) {
+        if (! File::exists($providersPath)) {
             $output->writeln('<comment>bootstrap/providers.php 文件不存在，跳过移除步骤。</comment>');
+
             return;
         }
 
         try {
             $providersContent = File::get($providersPath);
-            
+
             // 检查是否包含 TelescopeServiceProvider
             if (strpos($providersContent, 'TelescopeServiceProvider') === false) {
                 $output->writeln('<info>bootstrap/providers.php 中未发现 TelescopeServiceProvider，无需移除。</info>');
+
                 return;
             }
 
             // 移除 TelescopeServiceProvider 相关行
             $lines = explode("\n", $providersContent);
             $filteredLines = [];
-            
+
             foreach ($lines as $line) {
                 // 跳过包含 TelescopeServiceProvider 的行
                 if (strpos($line, 'TelescopeServiceProvider') === false) {
                     $filteredLines[] = $line;
                 } else {
-                    $output->writeln("<comment>移除行: " . trim($line) . "</comment>");
+                    $output->writeln('<comment>移除行: '.trim($line).'</comment>');
                 }
             }
 
             $newContent = implode("\n", $filteredLines);
             File::put($providersPath, $newContent);
             $output->writeln('<info>已从 bootstrap/providers.php 中移除 TelescopeServiceProvider。</info>');
-            
+
         } catch (\Exception $e) {
             $output->writeln("<comment>无法自动移除 TelescopeServiceProvider: {$e->getMessage()}</comment>");
             $output->writeln('<comment>请手动从 bootstrap/providers.php 中移除 Laravel\\Telescope\\TelescopeServiceProvider::class</comment>');
@@ -302,7 +309,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
         $step1Message = $telescopeInstalled ? '已完成' : '需要执行';
         note("{$step1Status} composer require laravel/telescope{$devFlag} ({$step1Message})");
 
-        if (!$telescopeInstalled) {
+        if (! $telescopeInstalled) {
             note('   执行此命令安装 Telescope 包');
         }
 
@@ -311,7 +318,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
         $step2Message = $telescopeConfigExists ? '已完成' : ($telescopeInstalled ? '待执行' : '等待上一步完成');
         note("{$step2Status} php artisan telescope:install ({$step2Message})");
 
-        if ($telescopeInstalled && !$telescopeConfigExists) {
+        if ($telescopeInstalled && ! $telescopeConfigExists) {
             note('   如果命令无法识别，请先尝试：');
             note('   - php artisan config:clear');
             note('   - php artisan cache:clear');
@@ -325,7 +332,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
             $step3Message = $providersFileClean ? '已完成' : '待执行';
             note("{$step3Status} 移除 bootstrap/providers.php 中的 TelescopeServiceProvider ({$step3Message})");
 
-            if (!$providersFileClean) {
+            if (! $providersFileClean) {
                 note('   从 bootstrap/providers.php 中删除以下行：');
                 note('   Laravel\\Telescope\\TelescopeServiceProvider::class,');
             }
@@ -334,7 +341,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
             $step4Message = $composerJsonConfigured ? '已完成' : '待执行';
             note("{$step4Status} 配置 composer.json 的 dont-discover ({$step4Message})");
 
-            if (!$composerJsonConfigured) {
+            if (! $composerJsonConfigured) {
                 note('   在 composer.json 中添加以下配置：');
                 note('   "extra": {');
                 note('     "laravel": {');
@@ -368,7 +375,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
         }
 
         // 如果有部分步骤已完成，给出更具体的指导
-        if ($telescopeInstalled && !$telescopeConfigExists) {
+        if ($telescopeInstalled && ! $telescopeConfigExists) {
             note('');
             warning('下一步建议：');
             note('由于 Telescope 包已安装但配置文件缺失，建议先清除缓存：');
@@ -384,13 +391,14 @@ class TelescopeInstaller extends AbstractExtensionInstaller
     {
         $composerPath = base_path('composer.json');
 
-        if (!File::exists($composerPath)) {
+        if (! File::exists($composerPath)) {
             return false;
         }
 
         try {
             $composer = json_decode(File::get($composerPath), true);
             $dontDiscover = $composer['extra']['laravel']['dont-discover'] ?? [];
+
             return in_array('laravel/telescope', $dontDiscover);
         } catch (\Exception $e) {
             return false;
@@ -404,12 +412,13 @@ class TelescopeInstaller extends AbstractExtensionInstaller
     {
         $providersPath = base_path('bootstrap/providers.php');
 
-        if (!File::exists($providersPath)) {
+        if (! File::exists($providersPath)) {
             return true; // 文件不存在认为是干净的
         }
 
         try {
             $providersContent = File::get($providersPath);
+
             return strpos($providersContent, 'TelescopeServiceProvider') === false;
         } catch (\Exception $e) {
             return false;
@@ -423,20 +432,20 @@ class TelescopeInstaller extends AbstractExtensionInstaller
     {
         return 'telescope_';
     }
-    
+
     /**
      * 获取扩展的默认配置
      */
     protected function getExtensionDefaultConfig(): array
     {
         // 创建 TelescopeExtension 实例并获取其默认配置
-        $extension = new \Abe\Prism\Extensions\TelescopeExtension();
-        
+        $extension = new \Abe\Prism\Extensions\TelescopeExtension;
+
         // 使用反射访问 protected 方法 getDefaultConfig
         $reflection = new \ReflectionClass($extension);
         $method = $reflection->getMethod('getDefaultConfig');
         $method->setAccessible(true);
-        
+
         return $method->invoke($extension);
     }
 }

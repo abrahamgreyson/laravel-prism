@@ -3,8 +3,8 @@
 namespace Abe\Prism\Extensions;
 
 use Abe\Prism\Contracts\Extension;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Foundation\Application;
 
 abstract class AbstractExtension implements Extension
 {
@@ -30,6 +30,7 @@ abstract class AbstractExtension implements Extension
     protected function getConfig(): array
     {
         $config = config($this->getConfigKey(), []);
+
         return array_merge($this->getDefaultConfig(), $config);
     }
 
@@ -47,9 +48,9 @@ abstract class AbstractExtension implements Extension
     public function shouldRegister(Application $app): bool
     {
         $config = $this->getConfig();
-        
+
         // 只有在配置了自动注册且扩展存在时才注册
-        if (!$config['auto_register'] || !$this->isInstalled()) {
+        if (! $config['auto_register'] || ! $this->isInstalled()) {
             return false;
         }
 
@@ -75,7 +76,7 @@ abstract class AbstractExtension implements Extension
     public function register(Application $app): void
     {
         $app->register($this->getServiceProviderClass());
-        
+
         // 注册额外的服务提供者
         foreach ($this->getAdditionalServiceProviders() as $provider) {
             if (class_exists($provider)) {

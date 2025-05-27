@@ -58,14 +58,16 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
         if ($this->isInstalled()) {
             $output->writeln("<comment>{$this->getDisplayName()} 已经安装，跳过安装步骤。</comment>");
             $this->updateConfig($options);
+
             return true;
         }
 
         // 显示即将执行的操作
         $this->showInstallSteps($output, $options);
 
-        if (!confirm("是否继续安装 {$this->getDisplayName()}？", true)) {
+        if (! confirm("是否继续安装 {$this->getDisplayName()}？", true)) {
             $output->writeln("<comment>跳过 {$this->getDisplayName()} 安装。</comment>");
+
             return false;
         }
 
@@ -75,15 +77,18 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
             if ($success) {
                 $this->updateConfig($options);
                 info("🎉 {$this->getDisplayName()} 安装完成！");
+
                 return true;
             } else {
                 warning("⚠️ {$this->getDisplayName()} 安装可能需要手动完成");
                 $this->showManualSteps($output, $options);
+
                 return false;
             }
         } catch (\Exception $e) {
             $output->writeln("<error>❌ {$this->getDisplayName()} 安装失败: {$e->getMessage()}</error>");
             $this->handleInstallError($output, $options, $e);
+
             return false;
         }
     }
@@ -94,10 +99,10 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
     protected function showInstallSteps(OutputInterface $output, array $options): void
     {
         warning("即将执行以下 {$this->getDisplayName()} 安装步骤：");
-        
+
         $steps = $this->getInstallSteps($options);
         foreach ($steps as $i => $step) {
-            note(($i + 1) . ". {$step}");
+            note(($i + 1).". {$step}");
         }
     }
 
@@ -113,13 +118,13 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
             try {
                 $process->setTty(true);
             } catch (\RuntimeException $e) {
-                $output->writeln('<comment>无法启用 TTY 模式: ' . $e->getMessage() . '</comment>');
+                $output->writeln('<comment>无法启用 TTY 模式: '.$e->getMessage().'</comment>');
             }
         }
 
         // 运行命令并实时输出
         $process->run(function ($type, $line) use ($output) {
-            $output->write('    ' . $line);
+            $output->write('    '.$line);
         });
 
         return $process->isSuccessful();
@@ -141,9 +146,10 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
 
         if ($success) {
             info("✅ {$packageName} 包安装成功！");
+
             return true;
         } else {
-            throw new \Exception("Composer 安装失败");
+            throw new \Exception('Composer 安装失败');
         }
     }
 
@@ -153,12 +159,12 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
     protected function clearApplicationCache(OutputInterface $output): void
     {
         $output->writeln('<info>清除应用缓存...</info>');
-        
+
         $commands = [
             'config:clear',
             'cache:clear',
             'route:clear',
-            'view:clear'
+            'view:clear',
         ];
 
         foreach ($commands as $command) {
@@ -211,7 +217,7 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
     public function updateConfig(array $options): void
     {
         $configPath = config_path('prism.php');
-        if (!File::exists($configPath)) {
+        if (! File::exists($configPath)) {
             return;
         }
 
@@ -231,18 +237,18 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
     {
         $prefix = $this->getConfigPrefix();
         $extensionName = $this->getName();
-        
+
         // 获取扩展的默认配置
         $defaultConfig = $this->getExtensionDefaultConfig();
-        
+
         // 合并用户选择的选项和默认配置
         $configToUpdate = [];
-        
+
         // 首先添加默认配置
         foreach ($defaultConfig as $key => $value) {
             $configToUpdate[$key] = $value;
         }
-        
+
         // 然后用用户选择的选项覆盖默认配置
         foreach ($options as $key => $value) {
             if (str_starts_with($key, $prefix)) {
@@ -250,15 +256,15 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
                 $configToUpdate[$configKey] = $value;
             }
         }
-        
+
         // 更新配置文件内容
         foreach ($configToUpdate as $configKey => $value) {
             $valueString = is_bool($value) ? ($value ? 'true' : 'false') : "'{$value}'";
-            
+
             // 使用更精确的正则表达式来匹配嵌套配置
             $pattern = "/('$configKey'\s*=>\s*)[^,\n\]]+/";
             $replacement = "'$configKey' => $valueString";
-            
+
             // 只在扩展配置块内进行替换
             $sectionPattern = "/('$extensionName'\s*=>\s*\[[^\]]*?)('$configKey'\s*=>\s*[^,\n\]]+)([^\]]*\])/s";
             if (preg_match($sectionPattern, $configContent)) {
@@ -271,7 +277,7 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
 
         return $configContent;
     }
-    
+
     /**
      * 获取扩展的默认配置（子类可覆盖）
      */
