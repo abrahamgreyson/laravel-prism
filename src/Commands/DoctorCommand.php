@@ -7,7 +7,6 @@ use Abe\Prism\Support\ExtensionInstallerManager;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Artisan;
 
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\warning;
