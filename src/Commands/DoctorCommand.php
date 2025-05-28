@@ -5,8 +5,8 @@ namespace Abe\Prism\Commands;
 use Abe\Prism\Support\ExtensionInstallerManager;
 use Abe\Prism\Support\ExtensionStateManager;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
 
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\warning;
