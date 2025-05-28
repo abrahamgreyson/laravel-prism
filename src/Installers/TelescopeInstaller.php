@@ -69,7 +69,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
     {
         return [
             'telescope_install' => false,
-            'telescope_environment' => 'local',
+            // 移除 telescope_environment，使用全局的 environment
         ];
     }
 
@@ -78,18 +78,9 @@ class TelescopeInstaller extends AbstractExtensionInstaller
      */
     public function configureOptions(array $options): array
     {
-        if (isset($options['telescope_install']) && $options['telescope_install']) {
-            $options['telescope_environment'] = select(
-                '请选择 Telescope 的安装环境：',
-                [
-                    'local' => '仅本地环境 (local)',
-                    'production' => '仅生产环境 (production)',
-                    'all' => '所有环境',
-                ],
-                'local'
-            );
-        }
-
+        // 扩展特定的配置逻辑可以在这里处理
+        // 环境配置由 ExtensionInstallerManager 统一处理
+        
         return $options;
     }
 
@@ -98,13 +89,14 @@ class TelescopeInstaller extends AbstractExtensionInstaller
      */
     protected function getInstallSteps(array $options): array
     {
-        $devFlag = $options['telescope_environment'] === 'local' ? ' --dev' : '';
+        $environment = $options['environment'] ?? 'local';
+        $devFlag = $environment === 'local' ? ' --dev' : '';
         $steps = [
             "composer require laravel/telescope{$devFlag}",
             'php artisan telescope:install',
         ];
 
-        if ($options['telescope_environment'] === 'local') {
+        if ($environment === 'local') {
             $steps[] = '移除 bootstrap/providers.php 中的 TelescopeServiceProvider 注册';
             $steps[] = '配置 composer.json 的 dont-discover';
             $steps[] = '由 Prism 控制 Telescope 的环境加载';
@@ -120,6 +112,9 @@ class TelescopeInstaller extends AbstractExtensionInstaller
      */
     protected function executeInstallSteps(OutputInterface $output, array $options): bool
     {
+        // 直接使用全局的 environment 配置
+        $environment = $options['environment'] ?? 'local';
+
         // 1. 安装 Telescope 包
         if (! $this->installComposerPackage($output, $options)) {
             return false;
@@ -134,7 +129,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
         }
 
         // 4. 根据环境执行不同的配置
-        if ($options['telescope_environment'] === 'local') {
+        if ($environment === 'local') {
             // Local 环境：移除自动注册，配置 dont-discover
             $this->removeTelescopeFromProviders($output);
             $this->configureComposerDontDiscover($output);
@@ -293,7 +288,9 @@ class TelescopeInstaller extends AbstractExtensionInstaller
      */
     public function showManualSteps(OutputInterface $output, array $options): void
     {
-        $devFlag = $options['telescope_environment'] === 'local' ? ' --dev' : '';
+        // 使用全局环境配置
+        $environment = $options['environment'] ?? 'local';
+        $devFlag = $environment === 'local' ? ' --dev' : '';
 
         // 检查各个步骤的完成状态
         $telescopeInstalled = $this->isInstalled();
@@ -326,7 +323,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
         }
 
         // 根据环境显示不同的后续步骤
-        if ($options['telescope_environment'] === 'local') {
+        if ($environment === 'local') {
             // Local 环境的特殊配置
             $step3Status = $providersFileClean ? '✅' : '⏳';
             $step3Message = $providersFileClean ? '已完成' : '待执行';
@@ -366,7 +363,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
         info('💡 完成所有步骤后，Telescope 将在 /telescope 路径可用');
 
         // 根据环境给出具体的使用说明
-        if ($options['telescope_environment'] === 'local') {
+        if ($environment === 'local') {
             note('');
             info('🔧 本地环境配置完成后：');
             note('- Telescope 只在本地环境加载（通过 Prism 控制）');

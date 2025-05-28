@@ -143,7 +143,7 @@ class InstallCommand extends Command
         // 安装 Telescope（如果选择）
         if ($options['telescope_install']) {
             $context = [
-                'environment' => $options['telescope_environment'],
+                'environment' => $options['environment'], // 使用全局环境配置
                 'force' => $input->getOption('force'),
                 'interactive' => $input->isInteractive(),
             ];
@@ -157,7 +157,7 @@ class InstallCommand extends Command
                 $this->stateManager->recordInstallation('telescope', [
                     'installation_method' => 'prism',
                     'configuration' => [
-                        'environment' => $options['telescope_environment'],
+                        'environment' => $options['environment'], // 使用全局环境配置
                         'auto_register' => true,
                     ],
                 ]);

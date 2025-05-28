@@ -136,7 +136,10 @@ abstract class AbstractExtensionInstaller implements ExtensionInstaller
     protected function installComposerPackage(OutputInterface $output, array $options): bool
     {
         $packageName = $this->getComposerPackage();
-        $devFlag = ($options['environment'] ?? '') === 'dev' ? ' --dev' : '';
+        $environment = $options['environment'] ?? 'local';
+        
+        // local 环境使用 --dev，其他环境不使用
+        $devFlag = $environment === 'local' ? ' --dev' : '';
         $composerCommand = "composer require {$packageName}{$devFlag}";
 
         $output->writeln("<info>正在安装 {$packageName} 包...</info>");

@@ -30,8 +30,10 @@ class ExtensionInstallerManager
         // 自动注册 Telescope 安装器
         $this->register(new \Abe\Prism\Installers\TelescopeInstaller);
 
+        // 注册 Octane 安装器（展示统一环境配置的效果）
+        $this->register(new \Abe\Prism\Installers\OctaneInstaller);
+
         // 如果有其他安装器，可以在这里添加
-        // $this->register(new \Abe\Prism\Installers\OctaneInstaller());
     }
 
     /**
@@ -80,8 +82,9 @@ class ExtensionInstallerManager
             $options = array_merge($options, $installer->getInstallOptions());
         }
 
-        // 如果是非交互模式，直接返回默认选项
+        // 如果是非交互模式，设置默认环境并返回
         if (! $isInteractive) {
+            $options['environment'] = 'local'; // 默认环境
             return $options;
         }
 
@@ -102,6 +105,29 @@ class ExtensionInstallerManager
         // 更新选项
         foreach ($packages as $key => $description) {
             $options[$key] = in_array($key, $selectedKeys);
+        }
+
+        // 如果选择了任何扩展，询问全局环境设置
+        $hasSelectedExtensions = false;
+        foreach ($this->installers as $installer) {
+            if ($options["{$installer->getName()}_install"]) {
+                $hasSelectedExtensions = true;
+                break;
+            }
+        }
+
+        if ($hasSelectedExtensions) {
+            $options['environment'] = select(
+                '请选择扩展的安装环境：',
+                [
+                    'local' => '仅本地环境 (local) - 适用于开发调试工具',
+                    'production' => '仅生产环境 (production) - 适用于生产优化工具',
+                    'all' => '所有环境 - 扩展在所有环境中可用',
+                ],
+                'local'
+            );
+        } else {
+            $options['environment'] = 'local'; // 默认环境
         }
 
         // 为选中的扩展配置具体选项
