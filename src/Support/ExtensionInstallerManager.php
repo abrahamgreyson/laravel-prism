@@ -85,6 +85,7 @@ class ExtensionInstallerManager
         // 如果是非交互模式，设置默认环境并返回
         if (! $isInteractive) {
             $options['environment'] = 'local'; // 默认环境
+
             return $options;
         }
 

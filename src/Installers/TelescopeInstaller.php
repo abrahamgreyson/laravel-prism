@@ -9,7 +9,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\note;
-use function Laravel\Prompts\select;
 use function Laravel\Prompts\warning;
 
 class TelescopeInstaller extends AbstractExtensionInstaller
@@ -80,7 +79,7 @@ class TelescopeInstaller extends AbstractExtensionInstaller
     {
         // 扩展特定的配置逻辑可以在这里处理
         // 环境配置由 ExtensionInstallerManager 统一处理
-        
+
         return $options;
     }
 
