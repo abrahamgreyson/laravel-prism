@@ -51,6 +51,14 @@ class OctaneInstaller extends AbstractExtensionInstaller
     }
 
     /**
+     * 获取扩展类名
+     */
+    public function getExtensionClass(): string
+    {
+        return 'Laravel\\Octane\\Octane';
+    }
+
+    /**
      * 获取安装选项
      */
     public function getInstallOptions(): array
